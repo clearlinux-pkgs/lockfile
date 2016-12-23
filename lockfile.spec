@@ -4,7 +4,7 @@
 #
 Name     : lockfile
 Version  : 0.12.2
-Release  : 22
+Release  : 23
 URL      : http://tarballs.openstack.org/pylockfile/lockfile-0.12.2.tar.gz
 Source0  : http://tarballs.openstack.org/pylockfile/lockfile-0.12.2.tar.gz
 Summary  : Platform-independent file locking module
