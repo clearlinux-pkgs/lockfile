@@ -4,26 +4,22 @@
 #
 Name     : lockfile
 Version  : 0.12.2
-Release  : 24
-URL      : http://tarballs.openstack.org/pylockfile/lockfile-0.12.2.tar.gz
-Source0  : http://tarballs.openstack.org/pylockfile/lockfile-0.12.2.tar.gz
+Release  : 25
+URL      : https://files.pythonhosted.org/packages/17/47/72cb04a58a35ec495f96984dddb48232b551aafb95bde614605b754fe6f7/lockfile-0.12.2.tar.gz
+Source0  : https://files.pythonhosted.org/packages/17/47/72cb04a58a35ec495f96984dddb48232b551aafb95bde614605b754fe6f7/lockfile-0.12.2.tar.gz
 Summary  : Platform-independent file locking module
 Group    : Development/Tools
 License  : MIT
-Requires: lockfile-python
-BuildRequires : Jinja2
-BuildRequires : Pygments
+Requires: lockfile-license = %{version}-%{release}
+Requires: lockfile-python = %{version}-%{release}
+Requires: lockfile-python3 = %{version}-%{release}
+BuildRequires : Sphinx
 BuildRequires : Sphinx-python
-BuildRequires : docutils-python
-BuildRequires : nose-python
+BuildRequires : buildreq-distutils3
 BuildRequires : pbr
-BuildRequires : pip
 BuildRequires : pluggy
 BuildRequires : py-python
 BuildRequires : pytest
-BuildRequires : python-dev
-BuildRequires : python3-dev
-BuildRequires : setuptools
 BuildRequires : tox
 BuildRequires : virtualenv
 
@@ -34,34 +30,80 @@ used instead. For any questions or comments or further help needed
 please email `openstack-dev`_ and prefix your email subject
 with ``[oslo][pylockfile]`` (for a faster response).
 
+%package license
+Summary: license components for the lockfile package.
+Group: Default
+
+%description license
+license components for the lockfile package.
+
+
 %package python
 Summary: python components for the lockfile package.
 Group: Default
+Requires: lockfile-python3 = %{version}-%{release}
 
 %description python
 python components for the lockfile package.
 
 
+%package python3
+Summary: python3 components for the lockfile package.
+Group: Default
+Requires: python3-core
+Provides: pypi(lockfile)
+
+%description python3
+python3 components for the lockfile package.
+
+
 %prep
 %setup -q -n lockfile-0.12.2
+cd %{_builddir}/lockfile-0.12.2
 
 %build
-python2 setup.py build -b py2
-python3 setup.py build -b py3
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1587084349
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
+export MAKEFLAGS=%{?_smp_mflags}
+python3 setup.py build
 
 %check
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-PYTHONPATH=%{buildroot}/usr/lib/python2.7/site-packages python2 setup.py test || :
+PYTHONPATH=%{buildroot}$(python -c "import sys; print(sys.path[-1])") python setup.py test || :
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
-python2 -tt setup.py build -b py2 install --root=%{buildroot}
-python3 -tt setup.py build -b py3 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/lockfile
+cp %{_builddir}/lockfile-0.12.2/LICENSE %{buildroot}/usr/share/package-licenses/lockfile/937157040d49ab4bbcf2070ed8f9b6849fdfa442
+python3 -tt setup.py build  install --root=%{buildroot}
+echo ----[ mark ]----
+cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
+echo ----[ mark ]----
 
 %files
 %defattr(-,root,root,-)
 
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/lockfile/937157040d49ab4bbcf2070ed8f9b6849fdfa442
+
 %files python
 %defattr(-,root,root,-)
-/usr/lib/python*/*
+
+%files python3
+%defattr(-,root,root,-)
+/usr/lib/python3*/*
