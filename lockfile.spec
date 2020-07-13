@@ -4,7 +4,7 @@
 #
 Name     : lockfile
 Version  : 0.12.2
-Release  : 25
+Release  : 26
 URL      : https://files.pythonhosted.org/packages/17/47/72cb04a58a35ec495f96984dddb48232b551aafb95bde614605b754fe6f7/lockfile-0.12.2.tar.gz
 Source0  : https://files.pythonhosted.org/packages/17/47/72cb04a58a35ec495f96984dddb48232b551aafb95bde614605b754fe6f7/lockfile-0.12.2.tar.gz
 Summary  : Platform-independent file locking module
